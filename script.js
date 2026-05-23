@@ -12,7 +12,7 @@
 
    Pasos detallados al final de este archivo.
    ============================================================ */
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJThhtijDO8dMKj_1gwteSxtiD1wf0LvKr1MPjHGuvTSipx0we2nWq_XTXxSj56Dp8/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzclBNnmbYVF33rNLVLh2owH43YlMrj1CGWrYyIxBAuZNECVh0NDNnyN1wvjlhj0_Y/exec";
 
 const STORAGE_KEY = "jf_encuesta_enviada_v1";
 

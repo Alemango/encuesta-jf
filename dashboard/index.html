@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="description" content="Dashboard de resultados — Encuesta Jóvenes Filadelfia" />
+  <title>Dashboard · Jóvenes Filadelfia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+
+  <!-- Fondo decorativo -->
+  <div class="bg-orbs" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+  </div>
+
+  <div class="layout">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-dot"></span>
+        <span class="brand-name">JF<span class="brand-accent">Dashboard</span></span>
+      </div>
+      <nav class="sidebar-nav" aria-label="Secciones">
+        <a href="#overview" class="nav-link active" data-section="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Resumen
+        </a>
+        <a href="#horario" class="nav-link" data-section="horario">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Horario actual
+        </a>
+        <a href="#sabado" class="nav-link" data-section="sabado">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Sábado 10 am
+        </a>
+        <a href="#traslado" class="nav-link" data-section="traslado">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Traslado
+        </a>
+        <a href="#edades" class="nav-link" data-section="edades">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Edades
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="../" class="back-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Ir a la encuesta
+        </a>
+      </div>
+    </aside>
+
+    <!-- ── MAIN CONTENT ── -->
+    <main class="main-content">
+
+      <!-- Header -->
+      <header class="top-bar">
+        <div class="top-bar-left">
+          <button class="menu-toggle" id="menuToggle" aria-label="Menú">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div>
+            <h1 class="page-title">Resultados de la encuesta</h1>
+            <p class="page-sub">Jóvenes Filadelfia · Análisis de respuestas</p>
+          </div>
+        </div>
+        <div class="top-bar-right">
+          <button class="btn-refresh" id="btnRefresh" title="Actualizar datos">
+            <svg id="refreshIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.3L3 16M3 21v-5h5"/></svg>
+            Actualizar
+          </button>
+          <div class="last-updated" id="lastUpdated">—</div>
+        </div>
+      </header>
+
+      <!-- Loading state -->
+      <div class="loading-state" id="loadingState">
+        <div class="spinner"></div>
+        <p>Cargando respuestas…</p>
+      </div>
+
+      <!-- Error state -->
+      <div class="error-state hidden" id="errorState">
+        <div class="error-icon">⚠️</div>
+        <h2>No se pudo cargar la data</h2>
+        <p id="errorMsg">Revisa que el Apps Script esté configurado correctamente.</p>
+        <button class="btn-refresh" onclick="loadData()">Reintentar</button>
+      </div>
+
+      <!-- Dashboard content -->
+      <div class="dashboard hidden" id="dashboardContent">
+
+        <!-- ── SECTION: OVERVIEW ── -->
+        <section id="overview" class="section">
+          <div class="kpi-grid">
+            <div class="kpi-card" id="kpiTotal">
+              <div class="kpi-icon">📋</div>
+              <div class="kpi-body">
+                <span class="kpi-value" id="totalRespuestas">—</span>
+                <span class="kpi-label">Respuestas totales</span>
+              </div>
+            </div>
+            <div class="kpi-card" id="kpiHorario">
+              <div class="kpi-icon">⭐</div>
+              <div class="kpi-body">
+                <span class="kpi-value" id="promedioHorario">—</span>
+                <span class="kpi-label">Prom. horario actual</span>
+              </div>
+            </div>
+            <div class="kpi-card" id="kpiSabado">
+              <div class="kpi-icon">📅</div>
+              <div class="kpi-body">
+                <span class="kpi-value" id="promedioSabado">—</span>
+                <span class="kpi-label">Prom. sábado 10 am</span>
+              </div>
+            </div>
+            <div class="kpi-card" id="kpiTraslado">
+              <div class="kpi-icon">🚀</div>
+              <div class="kpi-body">
+                <span class="kpi-value" id="pctSinProblema">—</span>
+                <span class="kpi-label">Sin problema de traslado</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── SECTION: HORARIO ACTUAL ── -->
+        <section id="horario" class="section">
+          <div class="section-header">
+            <h2 class="section-title">¿Qué opinas del horario actual?</h2>
+            <span class="section-badge" id="totalHorario">— respuestas</span>
+          </div>
+          <div class="charts-row">
+            <div class="chart-card chart-card--tall">
+              <p class="chart-title">Distribución de calificaciones</p>
+              <div class="chart-wrap">
+                <canvas id="chartHorario"></canvas>
+              </div>
+              <div class="scale-labels">
+                <span>😞 Muy malo</span><span>😐 Malo</span><span>🙂 Regular</span><span>😊 Bueno</span><span>🤩 Excelente</span>
+              </div>
+            </div>
+            <div class="chart-card">
+              <p class="chart-title">¿Por qué no les gusta? (rating ≤ 3)</p>
+              <div class="chart-wrap chart-wrap--sm">
+                <canvas id="chartRazonHorario"></canvas>
+              </div>
+              <div class="no-data hidden" id="noRazonHorario">Sin datos suficientes aún</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── SECTION: SÁBADO ── -->
+        <section id="sabado" class="section">
+          <div class="section-header">
+            <h2 class="section-title">Si las reuniones fueran <strong>sábado 10:00 am</strong></h2>
+            <span class="section-badge" id="totalSabado">— respuestas</span>
+          </div>
+          <div class="charts-row">
+            <div class="chart-card chart-card--tall">
+              <p class="chart-title">Distribución de respuestas</p>
+              <div class="chart-wrap">
+                <canvas id="chartSabado"></canvas>
+              </div>
+              <div class="scale-labels">
+                <span>😞 Imposible</span><span>😐 Difícil</span><span>🙂 Regular</span><span>😊 Bien</span><span>🤩 Perfecto</span>
+              </div>
+            </div>
+            <div class="chart-card">
+              <p class="chart-title">¿Por qué no podrían? (rating ≤ 3)</p>
+              <div class="chart-wrap chart-wrap--sm">
+                <canvas id="chartRazonSabado"></canvas>
+              </div>
+              <div class="no-data hidden" id="noRazonSabado">Sin datos suficientes aún</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── SECTION: TRASLADO ── -->
+        <section id="traslado" class="section">
+          <div class="section-header">
+            <h2 class="section-title">¿Es difícil trasladarte a las reuniones?</h2>
+            <span class="section-badge" id="totalTraslado">— respuestas</span>
+          </div>
+          <div class="charts-row charts-row--centered">
+            <div class="chart-card chart-card--doughnut">
+              <p class="chart-title">Distribución</p>
+              <div class="chart-wrap chart-wrap--doughnut">
+                <canvas id="chartTraslado"></canvas>
+              </div>
+            </div>
+            <div class="chart-card chart-card--bars">
+              <p class="chart-title">Traslado por grupo de edad</p>
+              <div class="chart-wrap">
+                <canvas id="chartTrasladoEdad"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── SECTION: EDADES ── -->
+        <section id="edades" class="section">
+          <div class="section-header">
+            <h2 class="section-title">¿Cuántos años tienes?</h2>
+            <span class="section-badge" id="totalEdades">— respuestas</span>
+          </div>
+          <div class="charts-row charts-row--centered">
+            <div class="chart-card chart-card--doughnut">
+              <p class="chart-title">Distribución por rango</p>
+              <div class="chart-wrap chart-wrap--doughnut">
+                <canvas id="chartEdad"></canvas>
+              </div>
+            </div>
+            <div class="chart-card chart-card--bars">
+              <p class="chart-title">Horario actual promedio por edad</p>
+              <div class="chart-wrap">
+                <canvas id="chartEdadHorario"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── RESPUESTAS ABIERTAS ── -->
+        <section class="section" id="comentarios">
+          <div class="section-header">
+            <h2 class="section-title">Comentarios abiertos</h2>
+          </div>
+          <div class="comment-cols">
+            <div class="comment-group">
+              <h3 class="comment-group-title">Sobre el horario actual</h3>
+              <ul class="comment-list" id="comentariosHorario"></ul>
+              <p class="no-data hidden" id="noComentariosHorario">Sin comentarios aún</p>
+            </div>
+            <div class="comment-group">
+              <h3 class="comment-group-title">Sobre el sábado 10 am</h3>
+              <ul class="comment-list" id="comentariosSabado"></ul>
+              <p class="no-data hidden" id="noComentariosSabado">Sin comentarios aún</p>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /dashboard -->
+    </main>
+  </div><!-- /layout -->
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

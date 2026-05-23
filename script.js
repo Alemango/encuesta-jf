@@ -3,59 +3,14 @@
    ============================================================ */
 
 /* ============================================================
-   CONFIGURACIÓN — INTEGRACIÓN GOOGLE SHEETS (DIFERIDA)
-   ------------------------------------------------------------
-   Cuando el liderazgo decida la versión final, pegar aquí
-   la URL del Google Apps Script desplegado como Web App y
-   descomentar el bloque "fetch" dentro de handleSubmit().
+   ⚙️ CONFIGURACIÓN — Google Sheets
 
-   --- PASOS PARA HABILITAR EL ENVÍO A GOOGLE SHEETS ---
+   Pega aquí la URL del Apps Script (termina en "/exec").
+   Si la dejas como "TU_URL_AQUÍ" o vacía, el formulario
+   funciona localmente y muestra la pantalla de gracias,
+   pero NO envía nada al Sheet.
 
-   1) Crear un Google Sheet vacío con esta cabecera en la fila 1:
-      timestamp | version | nombre | edad | opinionHorario |
-      razonHorario | razonHorarioDetalle | horarioSabado |
-      razonSabado | razonSabadoDetalle | frecuenciaAsistencia |
-      dificultadTraslado | atractivoReuniones | atractivoOtroDetalle
-
-   2) Extensiones → Apps Script → pegar:
-
-      function doPost(e) {
-        try {
-          const data = JSON.parse(e.postData.contents);
-          const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-          sheet.appendRow([
-            data.timestamp,
-            data.version,
-            data.nombre || "",
-            data.edad || "",
-            data.opinionHorario || "",
-            (data.razonHorario || []).join(", "),
-            data.razonHorarioDetalle || "",
-            data.horarioSabado || "",
-            (data.razonSabado || []).join(", "),
-            data.razonSabadoDetalle || "",
-            data.frecuenciaAsistencia || "",
-            data.dificultadTraslado || "",
-            (data.atractivoReuniones || []).join(", "),
-            data.atractivoOtroDetalle || "",
-          ]);
-          return ContentService
-            .createTextOutput(JSON.stringify({ ok: true }))
-            .setMimeType(ContentService.MimeType.JSON);
-        } catch (err) {
-          return ContentService
-            .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
-            .setMimeType(ContentService.MimeType.JSON);
-        }
-      }
-
-   3) Deploy → New deployment → Web app
-        - Execute as: Me
-        - Who has access: Anyone
-      Copiar la URL terminada en "/exec".
-
-   4) Pegar esa URL en GOOGLE_SCRIPT_URL abajo.
-   5) Descomentar el bloque "fetch" dentro de handleSubmit().
+   Pasos detallados al final de este archivo.
    ============================================================ */
 const GOOGLE_SCRIPT_URL = "TU_URL_AQUÍ";
 
@@ -68,48 +23,8 @@ const $  = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
 /* ============================================================
-   1) Edad — radios ocultos + labels estilizados como chips
-   ------------------------------------------------------------
-   Los 4 rangos (15-17, 18-21, 22-24, 25+) están en index.html
-   como <input type="radio"> reales para que la validación
-   HTML5 (required) funcione nativamente.
-   ============================================================ */
-
-/* ============================================================
-   2) Selector de versión
-   ============================================================ */
-function setupVersionSwitcher() {
-  const pills = $$(".version-pill");
-  pills.forEach((pill) => {
-    pill.addEventListener("click", () => {
-      const v = pill.dataset.setVersion;
-      document.body.setAttribute("data-version", v);
-      pills.forEach((p) => p.classList.toggle("is-active", p === pill));
-      updateRequiredFields();
-    });
-  });
-}
-
-/* ============================================================
-   3) Required dinámico según versión activa
-   ------------------------------------------------------------
-   Marcamos required en los inputs visibles según data-version.
-   - data-required="true": siempre requerido en cualquier versión
-   - data-required-v2="true": requerido solo cuando hay V2 activa
-   ============================================================ */
-function updateRequiredFields() {
-  const version = document.body.dataset.version;
-
-  // Campos base (siempre requeridos)
-  $$('[data-required="true"]').forEach((el) => el.required = true);
-
-  // Campos V2
-  const isV2 = version === "v2";
-  $$('[data-required-v2="true"]').forEach((el) => el.required = isV2);
-}
-
-/* ============================================================
-   4) Pregunta condicional: razón del horario
+   Pregunta condicional: muestra/oculta el menú de razones
+   cuando la escala 1-5 cae en 3 o menos.
    ============================================================ */
 function setupCondicional(inputName, conditionalId, checkboxName, detalleId) {
   const ratings = $$(`input[name="${inputName}"]`);
@@ -126,7 +41,6 @@ function setupCondicional(inputName, conditionalId, checkboxName, detalleId) {
       } else {
         conditional.classList.remove("is-open");
         conditional.setAttribute("aria-hidden", "true");
-        // Limpiar valores si se oculta
         $$(`input[name="${checkboxName}"]`).forEach((c) => c.checked = false);
         const detalle = $(`#${detalleId}`);
         if (detalle) detalle.value = "";
@@ -135,24 +49,11 @@ function setupCondicional(inputName, conditionalId, checkboxName, detalleId) {
   });
 }
 
-function setupCondicionalHorario() {
-  setupCondicional("opinionHorario", "razonHorario", "razonHorario", "razonHorarioDetalle");
-}
-
-function setupCondicionalSabado() {
-  setupCondicional("horarioSabado", "razonSabado", "razonSabado", "razonSabadoDetalle");
-}
-
 /* ============================================================
-   5) Validación personalizada (radios y chip de edad)
-   ------------------------------------------------------------
-   HTML5 valida los inputs nativos. Para los grupos custom
-   (edad como chips) hacemos validación manual y resaltamos
-   el field con .has-error.
+   Highlight visual de campos required sin selección.
+   La validación bloqueante la hace HTML5 (reportValidity).
    ============================================================ */
-function marcarErroresVisuales(form) {
-  // Highlight visual de fields con radios required sin selección.
-  // La validación bloqueante la hace HTML5 nativo (reportValidity).
+function marcarErroresVisuales() {
   $$(".field").forEach((f) => {
     const radios = $$('input[type="radio"]', f);
     if (radios.length === 0) return;
@@ -163,15 +64,13 @@ function marcarErroresVisuales(form) {
 }
 
 /* ============================================================
-   6) Construir payload según versión
+   Construir payload listo para enviar a Google Sheets.
    ============================================================ */
 function construirPayload(form) {
-  const version = document.body.dataset.version;
   const fd = new FormData(form);
 
   const payload = {
     timestamp: new Date().toISOString(),
-    version,
     edad: fd.get("edad") || "",
     opinionHorario: fd.get("opinionHorario") || "",
     razonHorario: fd.getAll("razonHorario"),
@@ -179,18 +78,8 @@ function construirPayload(form) {
     horarioSabado: fd.get("horarioSabado") || "",
     razonSabado: fd.getAll("razonSabado"),
     razonSabadoDetalle: (fd.get("razonSabadoDetalle") || "").toString().trim(),
+    dificultadTraslado: fd.get("dificultadTraslado") || "",
   };
-
-  if (version === "v1-nombre" || version === "v2") {
-    payload.nombre = (fd.get("nombre") || "").toString().trim();
-  }
-
-  if (version === "v2") {
-    payload.frecuenciaAsistencia = fd.get("frecuenciaAsistencia") || "";
-    payload.dificultadTraslado = fd.get("dificultadTraslado") || "";
-    payload.atractivoReuniones = fd.getAll("atractivoReuniones");
-    payload.atractivoOtroDetalle = (fd.get("atractivoOtroDetalle") || "").toString().trim();
-  }
 
   // Si la calificación es > 3, no enviamos razón (estaba oculta)
   if (Number(payload.opinionHorario) > 3) {
@@ -206,58 +95,58 @@ function construirPayload(form) {
 }
 
 /* ============================================================
-   7) Submit handler
+   Submit handler
    ============================================================ */
 async function handleSubmit(event) {
   event.preventDefault();
   const form = event.currentTarget;
 
-  // HTML5 nativo valida required en inputs/radios visibles
-  marcarErroresVisuales(form);
+  marcarErroresVisuales();
   if (!form.checkValidity()) {
     form.reportValidity();
     return;
   }
 
   const payload = construirPayload(form);
-  console.log("[Encuesta JF] Payload listo para enviar:", payload);
+  console.log("[Encuesta JF] Payload:", payload);
 
   const submitBtn = $(".btn-submit");
+  const submitText = submitBtn.querySelector("span");
   submitBtn.disabled = true;
-  submitBtn.querySelector("span").textContent = "Enviando...";
+  submitText.textContent = "Enviando...";
 
-  /* === INTEGRACIÓN GOOGLE SHEETS ============================
-     DESCOMENTAR cuando GOOGLE_SCRIPT_URL esté configurada.
+  // Envío al Sheet sólo si la URL está configurada
+  const tieneURL = GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "TU_URL_AQUÍ";
 
-  try {
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",                          // Apps Script no envía CORS por defecto
-      headers: { "Content-Type": "text/plain" }, // text/plain evita preflight
-      body: JSON.stringify(payload),
-    });
-  } catch (err) {
-    console.error("[Encuesta JF] Error al enviar:", err);
-    submitBtn.disabled = false;
-    submitBtn.querySelector("span").textContent = "Enviar respuesta";
-    alert("Hubo un problema al enviar. Por favor, intenta de nuevo.");
-    return;
+  if (tieneURL) {
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",                            // Apps Script no envía CORS por defecto
+        headers: { "Content-Type": "text/plain" },  // text/plain evita preflight
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.error("[Encuesta JF] Error al enviar:", err);
+      submitBtn.disabled = false;
+      submitText.textContent = "Enviar respuesta";
+      alert("Hubo un problema al enviar. Revisa tu conexión e intenta de nuevo.");
+      return;
+    }
+  } else {
+    console.warn("[Encuesta JF] GOOGLE_SCRIPT_URL no configurada — solo logging local.");
+    await new Promise((r) => setTimeout(r, 400));
   }
-  =========================================================== */
-
-  // Simulamos un pequeño delay para UX coherente
-  await new Promise((r) => setTimeout(r, 400));
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
     enviadoEn: new Date().toISOString(),
-    version: payload.version,
   }));
 
   showThankYou();
 }
 
 /* ============================================================
-   8) Mostrar pantalla de gracias
+   Pantalla de gracias
    ============================================================ */
 function showThankYou() {
   const form = $("#formContainer");
@@ -270,24 +159,20 @@ function showThankYou() {
 }
 
 /* ============================================================
-   9) Inicialización
+   Inicialización
    ============================================================ */
 function init() {
-  // Si ya respondió, mostrar pantalla de gracias directamente
   if (localStorage.getItem(STORAGE_KEY)) {
     showThankYou();
     return;
   }
 
-  setupVersionSwitcher();
-  setupCondicionalHorario();
-  setupCondicionalSabado();
-  updateRequiredFields();
+  setupCondicional("opinionHorario", "razonHorario", "razonHorario", "razonHorarioDetalle");
+  setupCondicional("horarioSabado", "razonSabado", "razonSabado", "razonSabadoDetalle");
 
   const form = $("#encuestaForm");
   if (form) form.addEventListener("submit", handleSubmit);
 
-  // Limpieza visual al cambiar selección en grupos required
   $$('input[type="radio"], input[type="checkbox"]').forEach((el) => {
     el.addEventListener("change", () => {
       el.closest(".field")?.classList.remove("has-error");
@@ -298,22 +183,90 @@ function init() {
 document.addEventListener("DOMContentLoaded", init);
 
 /* ============================================================
-   ESTRUCTURA ESPERADA DEL PAYLOAD (referencia)
+   📊 INTEGRACIÓN GOOGLE SHEETS — PASOS DETALLADOS
+   ============================================================
+
+   1) Crear la hoja de cálculo
+      - Ve a https://sheets.new
+      - Renombra la pestaña a "Respuestas"
+      - En la fila 1, pega esta cabecera (cada celda una columna):
+
+        timestamp | edad | opinionHorario | razonHorario |
+        razonHorarioDetalle | horarioSabado | razonSabado |
+        razonSabadoDetalle | dificultadTraslado
+
+   2) Crear el Apps Script
+      - En el menú: Extensiones → Apps Script
+      - Borra el contenido y pega:
+
+        function doPost(e) {
+          try {
+            const data = JSON.parse(e.postData.contents);
+            const sheet = SpreadsheetApp
+              .getActiveSpreadsheet()
+              .getSheetByName("Respuestas");
+            sheet.appendRow([
+              data.timestamp,
+              data.edad || "",
+              data.opinionHorario || "",
+              (data.razonHorario || []).join(", "),
+              data.razonHorarioDetalle || "",
+              data.horarioSabado || "",
+              (data.razonSabado || []).join(", "),
+              data.razonSabadoDetalle || "",
+              data.dificultadTraslado || "",
+            ]);
+            return ContentService
+              .createTextOutput(JSON.stringify({ ok: true }))
+              .setMimeType(ContentService.MimeType.JSON);
+          } catch (err) {
+            return ContentService
+              .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
+              .setMimeType(ContentService.MimeType.JSON);
+          }
+        }
+
+      - Guarda (💾) con cualquier nombre (ej. "Encuesta JF").
+
+   3) Desplegar como Web App
+      - Click en Deploy → New deployment
+      - Type: Web app
+      - Description: "Encuesta JF v1"
+      - Execute as: Me (tu cuenta)
+      - Who has access: Anyone
+      - Click Deploy. Autoriza permisos cuando lo pida.
+      - Copia la URL "Web app" (termina en /exec).
+
+   4) Pegar la URL aquí arriba
+      - Reemplaza "TU_URL_AQUÍ" en GOOGLE_SCRIPT_URL (línea 14).
+      - Sube los cambios a GitHub → Pages republica solo.
+
+   5) Probar
+      - Abre el form, llénalo y envía.
+      - Revisa el Sheet → debe aparecer una nueva fila.
+      - Si no aparece: abre DevTools → Console → busca errores.
+
+   --- IMPORTANTE ---
+   - "mode: no-cors" significa que el navegador NO puede leer
+     la respuesta del Apps Script. Es normal y funciona igual.
+   - Cada vez que cambies el código del Apps Script DEBES
+     desplegar una nueva versión (Deploy → Manage deployments
+     → editar la activa → Version: New version).
+   - La cabecera del Sheet sólo se pone UNA vez en la fila 1;
+     después el script solo añade filas.
+
+   ============================================================
+   ESTRUCTURA DEL PAYLOAD
    ------------------------------------------------------------
    {
      "timestamp": "2026-05-22T18:40:00.000Z",
-     "version": "v1" | "v1-nombre" | "v2",
-     "nombre": "Juan",                     // solo v1-nombre y v2
      "edad": "15-17" | "18-21" | "22-24" | "25+",
-     "opinionHorario": "4",                // "1"-"5"
-     "razonHorario": ["Transporte"],       // [] si opinion > 3
+     "opinionHorario": "4",                       // "1"-"5"
+     "razonHorario": ["Transporte"],              // [] si > 3
      "razonHorarioDetalle": "",
-     "horarioSabado": "3",                 // "1"-"5"
-     "razonSabado": ["Trabajo", "Otro"],   // [] si horarioSabado > 3
+     "horarioSabado": "3",                        // "1"-"5"
+     "razonSabado": ["Trabajo", "Otro"],          // [] si > 3
      "razonSabadoDetalle": "",
-     "frecuenciaAsistencia": "Siempre",    // solo v2
-     "dificultadTraslado": "Un poco",      // solo v2
-     "atractivoReuniones": ["Música"],     // solo v2
-     "atractivoOtroDetalle": ""            // solo v2
+     "dificultadTraslado": "Un poco complicado"
    }
    ============================================================ */

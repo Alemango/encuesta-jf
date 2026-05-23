@@ -11,14 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body data-version="v1">
-
-  <!-- Selector de versión (flotante, esquina superior derecha) -->
-  <nav class="version-switcher" aria-label="Selector de versión del formulario">
-    <button type="button" class="version-pill is-active" data-set-version="v1" aria-label="Versión 1: base sin nombre">V1</button>
-    <button type="button" class="version-pill" data-set-version="v1-nombre" aria-label="Versión 1 con campo de nombre">V1+N</button>
-    <button type="button" class="version-pill" data-set-version="v2" aria-label="Versión 2: completa con preguntas adicionales">V2</button>
-  </nav>
+<body>
 
   <!-- Fondo decorativo (orbes con blur) -->
   <div class="bg-orbs" aria-hidden="true">
@@ -38,20 +31,6 @@
       </header>
 
       <form id="encuestaForm" class="form">
-
-        <!-- Nombre (solo V1+N y V2, opcional) -->
-        <div class="field" data-show="nombre">
-          <label class="label" for="nombre">Tu nombre <span class="opt">(opcional)</span></label>
-          <input
-            class="input"
-            type="text"
-            id="nombre"
-            name="nombre"
-            placeholder="Como te conocen en el grupo"
-            autocomplete="given-name"
-            maxlength="50"
-          />
-        </div>
 
         <!-- Edad (4 rangos) -->
         <fieldset class="field">
@@ -81,27 +60,27 @@
           <legend class="label">¿Qué opinas del horario actual?</legend>
           <div class="rating" role="radiogroup" aria-label="Calificación del horario actual">
             <label class="rating-item">
-              <input type="radio" name="opinionHorario" value="1" data-required="true" />
+              <input type="radio" name="opinionHorario" value="1" required />
               <span class="emoji">😞</span>
               <span class="rating-label">Muy malo</span>
             </label>
             <label class="rating-item">
-              <input type="radio" name="opinionHorario" value="2" data-required="true" />
+              <input type="radio" name="opinionHorario" value="2" required />
               <span class="emoji">😐</span>
               <span class="rating-label">Malo</span>
             </label>
             <label class="rating-item">
-              <input type="radio" name="opinionHorario" value="3" data-required="true" />
+              <input type="radio" name="opinionHorario" value="3" required />
               <span class="emoji">🙂</span>
               <span class="rating-label">Regular</span>
             </label>
             <label class="rating-item">
-              <input type="radio" name="opinionHorario" value="4" data-required="true" />
+              <input type="radio" name="opinionHorario" value="4" required />
               <span class="emoji">😊</span>
               <span class="rating-label">Bueno</span>
             </label>
             <label class="rating-item">
-              <input type="radio" name="opinionHorario" value="5" data-required="true" />
+              <input type="radio" name="opinionHorario" value="5" required />
               <span class="emoji">🤩</span>
               <span class="rating-label">Excelente</span>
             </label>
@@ -150,27 +129,27 @@
           <legend class="label">Si las reuniones fueran <strong>sábado 10:00 am</strong>, ¿cómo te quedaría?</legend>
           <div class="rating" role="radiogroup" aria-label="Calificación del horario sábado 10am">
             <label class="rating-item">
-              <input type="radio" name="horarioSabado" value="1" data-required="true" />
+              <input type="radio" name="horarioSabado" value="1" required />
               <span class="emoji">😞</span>
               <span class="rating-label">Imposible</span>
             </label>
             <label class="rating-item">
-              <input type="radio" name="horarioSabado" value="2" data-required="true" />
+              <input type="radio" name="horarioSabado" value="2" required />
               <span class="emoji">😐</span>
               <span class="rating-label">Difícil</span>
             </label>
             <label class="rating-item">
-              <input type="radio" name="horarioSabado" value="3" data-required="true" />
+              <input type="radio" name="horarioSabado" value="3" required />
               <span class="emoji">🙂</span>
               <span class="rating-label">Regular</span>
             </label>
             <label class="rating-item">
-              <input type="radio" name="horarioSabado" value="4" data-required="true" />
+              <input type="radio" name="horarioSabado" value="4" required />
               <span class="emoji">😊</span>
               <span class="rating-label">Bien</span>
             </label>
             <label class="rating-item">
-              <input type="radio" name="horarioSabado" value="5" data-required="true" />
+              <input type="radio" name="horarioSabado" value="5" required />
               <span class="emoji">🤩</span>
               <span class="rating-label">Perfecto</span>
             </label>
@@ -219,87 +198,26 @@
           </div>
         </div>
 
-        <!-- ====== SOLO V2 ====== -->
-
-        <fieldset class="field" data-show="v2">
-          <legend class="label">¿Con qué frecuencia asistes actualmente?</legend>
-          <div class="radio-cards" role="radiogroup" aria-label="Frecuencia de asistencia">
-            <label class="radio-card">
-              <input type="radio" name="frecuenciaAsistencia" value="Siempre" data-required-v2="true" />
-              <span class="rc-icon">✨</span>
-              <span class="rc-text"><strong>Siempre</strong><small>Casi nunca falto</small></span>
-            </label>
-            <label class="radio-card">
-              <input type="radio" name="frecuenciaAsistencia" value="A veces" data-required-v2="true" />
-              <span class="rc-icon">🌀</span>
-              <span class="rc-text"><strong>A veces</strong><small>Depende</small></span>
-            </label>
-            <label class="radio-card">
-              <input type="radio" name="frecuenciaAsistencia" value="Raras veces" data-required-v2="true" />
-              <span class="rc-icon">🌙</span>
-              <span class="rc-text"><strong>Raras veces</strong><small>Casi no voy</small></span>
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="field" data-show="v2">
+        <!-- Dificultad de traslado -->
+        <fieldset class="field">
           <legend class="label">¿Es difícil para ti trasladarte a las reuniones?</legend>
           <div class="radio-cards" role="radiogroup" aria-label="Dificultad de traslado">
             <label class="radio-card">
-              <input type="radio" name="dificultadTraslado" value="No, sin problema" data-required-v2="true" />
+              <input type="radio" name="dificultadTraslado" value="No, sin problema" required />
               <span class="rc-icon">🚀</span>
               <span class="rc-text"><strong>Sin problema</strong><small>Llego fácil</small></span>
             </label>
             <label class="radio-card">
-              <input type="radio" name="dificultadTraslado" value="Un poco complicado" data-required-v2="true" />
+              <input type="radio" name="dificultadTraslado" value="Un poco complicado" required />
               <span class="rc-icon">🛵</span>
               <span class="rc-text"><strong>Un poco</strong><small>Complicado a veces</small></span>
             </label>
             <label class="radio-card">
-              <input type="radio" name="dificultadTraslado" value="Muy difícil" data-required-v2="true" />
+              <input type="radio" name="dificultadTraslado" value="Muy difícil" required />
               <span class="rc-icon">🧭</span>
               <span class="rc-text"><strong>Muy difícil</strong><small>Casi no puedo</small></span>
             </label>
           </div>
-        </fieldset>
-
-        <fieldset class="field" data-show="v2">
-          <legend class="label">¿Qué haría más atractivas las reuniones? <span class="opt">(elige las que quieras)</span></legend>
-          <div class="checks checks-grid">
-            <label class="check check-pill">
-              <input type="checkbox" name="atractivoReuniones" value="Más dinámicas" />
-              <span class="check-box" aria-hidden="true"></span>
-              <span>🎮 Más dinámicas</span>
-            </label>
-            <label class="check check-pill">
-              <input type="checkbox" name="atractivoReuniones" value="Temas prácticos" />
-              <span class="check-box" aria-hidden="true"></span>
-              <span>💡 Temas prácticos</span>
-            </label>
-            <label class="check check-pill">
-              <input type="checkbox" name="atractivoReuniones" value="Comida/Convivencia" />
-              <span class="check-box" aria-hidden="true"></span>
-              <span>🍕 Comida / Convivencia</span>
-            </label>
-            <label class="check check-pill">
-              <input type="checkbox" name="atractivoReuniones" value="Música" />
-              <span class="check-box" aria-hidden="true"></span>
-              <span>🎶 Música</span>
-            </label>
-            <label class="check check-pill check-full">
-              <input type="checkbox" id="atractivoOtroCheck" name="atractivoReuniones" value="Otro" />
-              <span class="check-box" aria-hidden="true"></span>
-              <span>✨ Otro</span>
-            </label>
-          </div>
-          <input
-            class="input input-sm"
-            type="text"
-            id="atractivoOtroDetalle"
-            name="atractivoOtroDetalle"
-            placeholder="¿Qué más te gustaría? (opcional)"
-            maxlength="120"
-          />
         </fieldset>
 
         <!-- Submit -->

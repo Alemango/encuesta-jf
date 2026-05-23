@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="description" content="Encuesta Jóvenes Filadelfia — Tu opinión cuenta" />
+  <title>Encuesta · Jóvenes Filadelfia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-version="v1">
+
+  <!-- Selector de versión (flotante, esquina superior derecha) -->
+  <nav class="version-switcher" aria-label="Selector de versión del formulario">
+    <button type="button" class="version-pill is-active" data-set-version="v1" aria-label="Versión 1: base sin nombre">V1</button>
+    <button type="button" class="version-pill" data-set-version="v1-nombre" aria-label="Versión 1 con campo de nombre">V1+N</button>
+    <button type="button" class="version-pill" data-set-version="v2" aria-label="Versión 2: completa con preguntas adicionales">V2</button>
+  </nav>
+
+  <!-- Fondo decorativo (orbes con blur) -->
+  <div class="bg-orbs" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+  </div>
+
+  <main class="app">
+
+    <!-- ====== FORMULARIO ====== -->
+    <section id="formContainer" class="card">
+      <header class="hero">
+        <span class="badge">JÓVENES FILADELFIA</span>
+        <h1 class="title">Tu opinión <span class="grad">importa</span></h1>
+        <p class="subtitle">Ayúdanos a construir mejores reuniones. Toma menos de 1 minuto.</p>
+      </header>
+
+      <form id="encuestaForm" class="form">
+
+        <!-- Nombre (solo V1+N y V2, opcional) -->
+        <div class="field" data-show="nombre">
+          <label class="label" for="nombre">Tu nombre <span class="opt">(opcional)</span></label>
+          <input
+            class="input"
+            type="text"
+            id="nombre"
+            name="nombre"
+            placeholder="Como te conocen en el grupo"
+            autocomplete="given-name"
+            maxlength="50"
+          />
+        </div>
+
+        <!-- Edad (4 rangos) -->
+        <fieldset class="field">
+          <legend class="label">¿Cuántos años tienes?</legend>
+          <div class="chips chips-age" role="radiogroup" aria-label="Edad">
+            <label class="chip" aria-label="15 a 17 años">
+              <input type="radio" name="edad" value="15-17" required />
+              <span>15-17</span>
+            </label>
+            <label class="chip" aria-label="18 a 21 años">
+              <input type="radio" name="edad" value="18-21" required />
+              <span>18-21</span>
+            </label>
+            <label class="chip" aria-label="22 a 24 años">
+              <input type="radio" name="edad" value="22-24" required />
+              <span>22-24</span>
+            </label>
+            <label class="chip" aria-label="25 años o más">
+              <input type="radio" name="edad" value="25+" required />
+              <span>25+</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- Horario actual (escala 1-5 con emojis) -->
+        <fieldset class="field">
+          <legend class="label">¿Qué opinas del horario actual?</legend>
+          <div class="rating" role="radiogroup" aria-label="Calificación del horario actual">
+            <label class="rating-item">
+              <input type="radio" name="opinionHorario" value="1" data-required="true" />
+              <span class="emoji">😞</span>
+              <span class="rating-label">Muy malo</span>
+            </label>
+            <label class="rating-item">
+              <input type="radio" name="opinionHorario" value="2" data-required="true" />
+              <span class="emoji">😐</span>
+              <span class="rating-label">Malo</span>
+            </label>
+            <label class="rating-item">
+              <input type="radio" name="opinionHorario" value="3" data-required="true" />
+              <span class="emoji">🙂</span>
+              <span class="rating-label">Regular</span>
+            </label>
+            <label class="rating-item">
+              <input type="radio" name="opinionHorario" value="4" data-required="true" />
+              <span class="emoji">😊</span>
+              <span class="rating-label">Bueno</span>
+            </label>
+            <label class="rating-item">
+              <input type="radio" name="opinionHorario" value="5" data-required="true" />
+              <span class="emoji">🤩</span>
+              <span class="rating-label">Excelente</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- Condicional: razón si rating <= 3 -->
+        <div id="razonHorario" class="conditional" aria-hidden="true">
+          <div class="conditional-inner">
+            <p class="label sub-label">¿Qué dificulta el horario actual? <span class="opt">(elige una o más)</span></p>
+            <div class="checks">
+              <label class="check">
+                <input type="checkbox" name="razonHorario" value="Cruce con escuela/trabajo" />
+                <span class="check-box" aria-hidden="true"></span>
+                <span>Cruce con escuela/trabajo</span>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="razonHorario" value="Transporte" />
+                <span class="check-box" aria-hidden="true"></span>
+                <span>Transporte</span>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="razonHorario" value="Tareas/Deberes" />
+                <span class="check-box" aria-hidden="true"></span>
+                <span>Tareas / Deberes</span>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="razonHorario" value="Otro" />
+                <span class="check-box" aria-hidden="true"></span>
+                <span>Otro</span>
+              </label>
+            </div>
+            <input
+              class="input input-sm"
+              type="text"
+              id="razonHorarioDetalle"
+              name="razonHorarioDetalle"
+              placeholder="Cuéntanos más (opcional)"
+              maxlength="120"
+            />
+          </div>
+        </div>
+
+        <!-- Horario matutino Sábado 10:00 am (escala 1-5) -->
+        <fieldset class="field">
+          <legend class="label">Si las reuniones fueran <strong>sábado 10:00 am</strong>, ¿cómo te quedaría?</legend>
+          <div class="rating" role="radiogroup" aria-label="Calificación del horario sábado 10am">
+            <label class="rating-item">
+              <input type="radio" name="horarioSabado" value="1" data-required="true" />
+              <span class="emoji">😞</span>
+              <span class="rating-label">Imposible</span>
+            </label>
+            <label class="rating-item">
+              <input type="radio" name="horarioSabado" value="2" data-required="true" />
+              <span class="emoji">😐</span>
+              <span class="rating-label">Difícil</span>
+            </label>
+            <label class="rating-item">
+              <input type="radio" name="horarioSabado" value="3" data-required="true" />
+              <span class="emoji">🙂</span>
+              <span class="rating-label">Regular</span>
+            </label>
+            <label class="rating-item">
+              <input type="radio" name="horarioSabado" value="4" data-required="true" />
+              <span class="emoji">😊</span>
+              <span class="rating-label">Bien</span>
+            </label>
+            <label class="rating-item">
+              <input type="radio" name="horarioSabado" value="5" data-required="true" />
+              <span class="emoji">🤩</span>
+              <span class="rating-label">Perfecto</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- Condicional: razón si sábado 10am es bajo (≤3) -->
+        <div id="razonSabado" class="conditional" aria-hidden="true">
+          <div class="conditional-inner">
+            <p class="label sub-label">¿Qué dificultaría asistir el sábado a las 10 am? <span class="opt">(elige una o más)</span></p>
+            <div class="checks">
+              <label class="check">
+                <input type="checkbox" name="razonSabado" value="Trabajo" />
+                <span class="check-box" aria-hidden="true"></span>
+                <span>Trabajo</span>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="razonSabado" value="Estudios" />
+                <span class="check-box" aria-hidden="true"></span>
+                <span>Estudios</span>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="razonSabado" value="Transporte/Distancia" />
+                <span class="check-box" aria-hidden="true"></span>
+                <span>Transporte / Distancia</span>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="razonSabado" value="Compromisos familiares" />
+                <span class="check-box" aria-hidden="true"></span>
+                <span>Compromisos familiares</span>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="razonSabado" value="Otro" />
+                <span class="check-box" aria-hidden="true"></span>
+                <span>Otro</span>
+              </label>
+            </div>
+            <input
+              class="input input-sm"
+              type="text"
+              id="razonSabadoDetalle"
+              name="razonSabadoDetalle"
+              placeholder="Cuéntanos más (opcional)"
+              maxlength="120"
+            />
+          </div>
+        </div>
+
+        <!-- ====== SOLO V2 ====== -->
+
+        <fieldset class="field" data-show="v2">
+          <legend class="label">¿Con qué frecuencia asistes actualmente?</legend>
+          <div class="radio-cards" role="radiogroup" aria-label="Frecuencia de asistencia">
+            <label class="radio-card">
+              <input type="radio" name="frecuenciaAsistencia" value="Siempre" data-required-v2="true" />
+              <span class="rc-icon">✨</span>
+              <span class="rc-text"><strong>Siempre</strong><small>Casi nunca falto</small></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="frecuenciaAsistencia" value="A veces" data-required-v2="true" />
+              <span class="rc-icon">🌀</span>
+              <span class="rc-text"><strong>A veces</strong><small>Depende</small></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="frecuenciaAsistencia" value="Raras veces" data-required-v2="true" />
+              <span class="rc-icon">🌙</span>
+              <span class="rc-text"><strong>Raras veces</strong><small>Casi no voy</small></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field" data-show="v2">
+          <legend class="label">¿Es difícil para ti trasladarte a las reuniones?</legend>
+          <div class="radio-cards" role="radiogroup" aria-label="Dificultad de traslado">
+            <label class="radio-card">
+              <input type="radio" name="dificultadTraslado" value="No, sin problema" data-required-v2="true" />
+              <span class="rc-icon">🚀</span>
+              <span class="rc-text"><strong>Sin problema</strong><small>Llego fácil</small></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="dificultadTraslado" value="Un poco complicado" data-required-v2="true" />
+              <span class="rc-icon">🛵</span>
+              <span class="rc-text"><strong>Un poco</strong><small>Complicado a veces</small></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="dificultadTraslado" value="Muy difícil" data-required-v2="true" />
+              <span class="rc-icon">🧭</span>
+              <span class="rc-text"><strong>Muy difícil</strong><small>Casi no puedo</small></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field" data-show="v2">
+          <legend class="label">¿Qué haría más atractivas las reuniones? <span class="opt">(elige las que quieras)</span></legend>
+          <div class="checks checks-grid">
+            <label class="check check-pill">
+              <input type="checkbox" name="atractivoReuniones" value="Más dinámicas" />
+              <span class="check-box" aria-hidden="true"></span>
+              <span>🎮 Más dinámicas</span>
+            </label>
+            <label class="check check-pill">
+              <input type="checkbox" name="atractivoReuniones" value="Temas prácticos" />
+              <span class="check-box" aria-hidden="true"></span>
+              <span>💡 Temas prácticos</span>
+            </label>
+            <label class="check check-pill">
+              <input type="checkbox" name="atractivoReuniones" value="Comida/Convivencia" />
+              <span class="check-box" aria-hidden="true"></span>
+              <span>🍕 Comida / Convivencia</span>
+            </label>
+            <label class="check check-pill">
+              <input type="checkbox" name="atractivoReuniones" value="Música" />
+              <span class="check-box" aria-hidden="true"></span>
+              <span>🎶 Música</span>
+            </label>
+            <label class="check check-pill check-full">
+              <input type="checkbox" id="atractivoOtroCheck" name="atractivoReuniones" value="Otro" />
+              <span class="check-box" aria-hidden="true"></span>
+              <span>✨ Otro</span>
+            </label>
+          </div>
+          <input
+            class="input input-sm"
+            type="text"
+            id="atractivoOtroDetalle"
+            name="atractivoOtroDetalle"
+            placeholder="¿Qué más te gustaría? (opcional)"
+            maxlength="120"
+          />
+        </fieldset>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit">
+          <span>Enviar respuesta</span>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 5l7 7-7 7"/>
+          </svg>
+        </button>
+
+        <p class="legal">Tus respuestas son anónimas y nos ayudan a mejorar.</p>
+      </form>
+    </section>
+
+    <!-- ====== PANTALLA DE GRACIAS ====== -->
+    <section id="thankYou" class="card thank-you" hidden>
+      <div class="check-circle" aria-hidden="true">
+        <svg viewBox="0 0 52 52">
+          <circle class="check-circle-bg" cx="26" cy="26" r="24" />
+          <path class="check-circle-tick" d="M14 27 L22 35 L38 18" />
+        </svg>
+      </div>
+      <h2 class="title">¡Gracias!</h2>
+      <p class="subtitle">Tu opinión ya fue registrada.</p>
+      <p class="muted">Cada respuesta nos ayuda a hacer del grupo un mejor lugar para todos.</p>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -14,8 +14,6 @@
    ============================================================ */
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzclBNnmbYVF33rNLVLh2owH43YlMrj1CGWrYyIxBAuZNECVh0NDNnyN1wvjlhj0_Y/exec";
 
-const STORAGE_KEY = "jf_encuesta_enviada_v1";
-
 /* ============================================================
    Helpers
    ============================================================ */
@@ -138,10 +136,6 @@ async function handleSubmit(event) {
     await new Promise((r) => setTimeout(r, 400));
   }
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    enviadoEn: new Date().toISOString(),
-  }));
-
   showThankYou();
 }
 
@@ -159,19 +153,50 @@ function showThankYou() {
 }
 
 /* ============================================================
+   Reiniciar para una nueva respuesta (uso en recepción)
+   ============================================================ */
+function resetParaNuevaRespuesta() {
+  const form = $("#encuestaForm");
+  const thx = $("#thankYou");
+  const submitBtn = $(".btn-submit:not(.btn-secondary)");
+
+  if (form) {
+    form.reset();
+    // Cerrar condicionales
+    $$(".conditional").forEach((c) => {
+      c.classList.remove("is-open");
+      c.setAttribute("aria-hidden", "true");
+    });
+    // Limpiar estados de error visual
+    $$(".field.has-error").forEach((f) => f.classList.remove("has-error"));
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    const span = submitBtn.querySelector("span");
+    if (span) span.textContent = "Enviar respuesta";
+  }
+
+  if (thx) thx.hidden = true;
+  const formContainer = $("#formContainer");
+  if (formContainer) {
+    formContainer.hidden = false;
+    formContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+/* ============================================================
    Inicialización
    ============================================================ */
 function init() {
-  if (localStorage.getItem(STORAGE_KEY)) {
-    showThankYou();
-    return;
-  }
-
   setupCondicional("opinionHorario", "razonHorario", "razonHorario", "razonHorarioDetalle");
   setupCondicional("horarioSabado", "razonSabado", "razonSabado", "razonSabadoDetalle");
 
   const form = $("#encuestaForm");
   if (form) form.addEventListener("submit", handleSubmit);
+
+  const nuevaBtn = $("#nuevaRespuestaBtn");
+  if (nuevaBtn) nuevaBtn.addEventListener("click", resetParaNuevaRespuesta);
 
   $$('input[type="radio"], input[type="checkbox"]').forEach((el) => {
     el.addEventListener("change", () => {

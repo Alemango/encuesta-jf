@@ -567,6 +567,27 @@ body {
 .btn-submit svg { transition: transform 0.25s var(--ease); }
 .btn-submit:hover svg { transform: translateX(4px); }
 
+.btn-secondary {
+  margin-top: 28px;
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid var(--border-strong);
+  color: #e9d5ff;
+  box-shadow: none;
+  min-height: 50px;
+  font-size: 15px;
+}
+
+.btn-secondary::before { display: none; }
+
+.btn-secondary:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: var(--violet);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px -8px rgba(139, 92, 246, 0.5);
+}
+
+.btn-secondary:hover svg { transform: rotate(-90deg); }
+
 .legal {
   text-align: center;
   color: var(--text-mute);

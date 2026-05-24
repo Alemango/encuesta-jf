@@ -9,7 +9,7 @@
    2. Pega la URL del mismo deployment (/exec) aquí abajo.
    ============================================================ */
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzclBNnmbYVF33rNLVLh2owH43YlMrj1CGWrYyIxBAuZNECVh0NDNnyN1wvjlhj0_Y/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx10SmHyHs4Iv9PdjLHeQTLE-dbjGbzuroDRjPHh0otHmDJ-CcZl3z7lW50wYlev-M0/exec";
 
 /* ── Mapeos ── */
 const OPINION_LABELS  = { 1:"Muy malo", 2:"Malo", 3:"Regular", 4:"Bueno", 5:"Excelente" };

@@ -29,6 +29,21 @@ const PALETTE = [
 ];
 const PALETTE_BORDER = PALETTE.map(c => c.replace(".85","1"));
 
+/* ── Chart.js: plugin fondo blanco (necesario para que canvas imprima bien) ── */
+const canvasBgPlugin = {
+  id: "canvasBg",
+  beforeDraw(chart) {
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return;
+    ctx.save();
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, chart.width, chart.height);
+    ctx.restore();
+  },
+};
+Chart.register(canvasBgPlugin);
+
 /* ── Chart.js defaults ── */
 Chart.defaults.color = "#8b8ba7";
 Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
@@ -36,6 +51,7 @@ Chart.defaults.font.size = 12;
 
 /* ── State ── */
 let charts = {};
+let _lastRows = null; // cache de la última carga para el PDF
 
 /* ============================================================
    FETCH DATA
@@ -89,6 +105,7 @@ function renderDashboard(rows) {
     showError("No hay respuestas registradas todavía.");
     return;
   }
+  _lastRows = rows;
   showDashboard();
 
   renderKPIs(rows);
@@ -517,12 +534,58 @@ function initMobileMenu() {
 }
 
 /* ============================================================
+   EXPORTAR PDF
+   ============================================================ */
+function printDashboard() {
+  // Asegurar header de impresión con fecha actualizada
+  const el = document.getElementById("printDate");
+  if (el) {
+    el.textContent = new Date().toLocaleString("es-MX", {
+      day: "2-digit", month: "long", year: "numeric",
+      hour: "2-digit", minute: "2-digit",
+    });
+  }
+
+  // Actualizar labels de Chart.js a colores oscuros antes de imprimir
+  const origColor = Chart.defaults.color;
+  Chart.defaults.color = "#64748b";
+  Object.values(charts).forEach(c => {
+    if (c.options.scales) {
+      Object.values(c.options.scales).forEach(scale => {
+        if (scale.grid) scale.grid.color = "rgba(0,0,0,0.06)";
+      });
+    }
+    c.update("none");
+  });
+
+  // Pequeño delay para que Chart.js repinte antes de print
+  setTimeout(() => {
+    window.print();
+
+    // Restaurar colores oscuros tras cerrar el diálogo
+    window.addEventListener("afterprint", function restore() {
+      Chart.defaults.color = origColor;
+      Object.values(charts).forEach(c => {
+        if (c.options.scales) {
+          Object.values(c.options.scales).forEach(scale => {
+            if (scale.grid) scale.grid.color = "rgba(255,255,255,0.04)";
+          });
+        }
+        c.update("none");
+      });
+      window.removeEventListener("afterprint", restore);
+    }, { once: true });
+  }, 80);
+}
+
+/* ============================================================
    INIT
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
   initNav();
   initMobileMenu();
   document.getElementById("btnRefresh")?.addEventListener("click", loadData);
+  document.getElementById("btnPDF")?.addEventListener("click", printDashboard);
   loadData();
 });
 

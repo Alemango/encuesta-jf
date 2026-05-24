@@ -96,6 +96,7 @@ function renderDashboard(rows) {
   renderSabado(rows);
   renderTraslado(rows);
   renderEdades(rows);
+  renderEdadSabado(rows);
   renderComentarios(rows);
 }
 
@@ -235,6 +236,90 @@ function renderEdades(rows) {
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: "rgba(255,255,255,0.04)" } },
+        y: { min: 0, max: 5, grid: { color: "rgba(255,255,255,0.04)" },
+             ticks: { stepSize: 1 } },
+      },
+    },
+  });
+}
+
+/* ── Sábado por edad ── */
+function renderEdadSabado(rows) {
+  // Promedio de horarioSabado por grupo de edad
+  const avgByAge = AGE_ORDER.map(age => {
+    const vals = rows
+      .filter(r => r.edad === age)
+      .map(r => Number(r.horarioSabado))
+      .filter(v => v > 0);
+    return vals.length ? +(avg(vals).toFixed(2)) : 0;
+  });
+
+  destroyChart("chartEdadSabado");
+  charts["chartEdadSabado"] = new Chart(
+    document.getElementById("chartEdadSabado"), {
+    type: "bar",
+    data: {
+      labels: AGE_ORDER,
+      datasets: [{
+        label: "Promedio sábado 10 am",
+        data: avgByAge,
+        backgroundColor: PALETTE[1],
+        borderRadius: 8,
+        borderSkipped: false,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: "rgba(255,255,255,0.04)" } },
+        y: { min: 0, max: 5, grid: { color: "rgba(255,255,255,0.04)" },
+             ticks: { stepSize: 1, callback: v => ["0","😞","😐","🙂","😊","🤩"][v] || v } },
+      },
+    },
+  });
+
+  // Comparativa: horario actual vs sábado 10 am
+  const avgHorarioByAge = AGE_ORDER.map(age => {
+    const vals = rows
+      .filter(r => r.edad === age)
+      .map(r => Number(r.opinionHorario))
+      .filter(v => v > 0);
+    return vals.length ? +(avg(vals).toFixed(2)) : 0;
+  });
+
+  destroyChart("chartEdadComparativa");
+  charts["chartEdadComparativa"] = new Chart(
+    document.getElementById("chartEdadComparativa"), {
+    type: "bar",
+    data: {
+      labels: AGE_ORDER,
+      datasets: [
+        {
+          label: "Horario actual",
+          data: avgHorarioByAge,
+          backgroundColor: PALETTE[0],
+          borderRadius: 6,
+          borderSkipped: false,
+        },
+        {
+          label: "Sábado 10 am",
+          data: avgByAge,
+          backgroundColor: PALETTE[1],
+          borderRadius: 6,
+          borderSkipped: false,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "bottom", labels: { boxWidth: 12, padding: 12 } },
+      },
       scales: {
         x: { grid: { color: "rgba(255,255,255,0.04)" } },
         y: { min: 0, max: 5, grid: { color: "rgba(255,255,255,0.04)" },
